@@ -1,0 +1,12 @@
+{
+  "title": "Uncertainty-aware link lifetime prediction and proactive routing for UAV swarms: simulation code and results (v1.0.0)",
+  "upload_type": "software",
+  "version": "1.0.0",
+  "description": "Python simulation code, raw JSON results and figure sources for the manuscript 'Uncertainty-Aware Link Lifetime Prediction and Proactive Routing for Reliable UAV Swarm Communications' (submitted to MDPI Drones). Implements risk-calibrated lifetime-aware routing (RCLR): a lower-quantile model of the residual UAV-to-UAV link lifetime with one-sided conformal calibration, adaptive conformal inference, hop-constrained widest-path routing with proactive switching, all baselines and simplified re-implementations of the routing decision rules of LB-OPAR, OLSR+, LPAR and LPMD-GPSR.",
+  "creators": [
+    {"name": "Abdirayimov, Renat", "orcid": "0009-0005-3636-8864", "affiliation": "Tashkent University of Information Technologies named after Muhammad al-Khwarizmi"}
+  ],
+  "license": "MIT",
+  "keywords": ["UAV swarm", "FANET", "link lifetime prediction", "conformal prediction", "quantile regression", "proactive routing"],
+  "access_right": "open"
+}
