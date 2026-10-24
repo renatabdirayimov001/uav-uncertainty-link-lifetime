@@ -4,6 +4,7 @@ title: "Uncertainty-aware link lifetime prediction and proactive routing for UAV
 version: 1.0.0
 date-released: 2026-10-24
 license: MIT
+doi: "10.5281/zenodo.23612462"
 repository-code: "https://github.com/renatabdirayimov001/uav-uncertainty-link-lifetime"
 authors:
   - family-names: Abdirayimov

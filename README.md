@@ -1,5 +1,7 @@
 # Uncertainty-Aware Link Lifetime Prediction and Proactive Routing for UAV Swarms
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23612462.svg)](https://doi.org/10.5281/zenodo.23612462)
+
 Simulation code, raw results and figure sources for the manuscript
 
 > R. Abdirayimov, *"Uncertainty-Aware Link Lifetime Prediction and Proactive Routing for Reliable UAV Swarm Communications"*, submitted to MDPI *Drones*, 2026.
