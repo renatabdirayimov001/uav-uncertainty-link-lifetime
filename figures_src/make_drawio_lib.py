@@ -18,6 +18,7 @@ def tex2html(t):
         t = _re.sub(r'\^\{([^{}]*)\}', r'<sup>\1</sup>', t)
     t = t.replace('{', '').replace('}', '') if '\\' not in t else t
     t = t.replace('\x01', '{').replace('\x02', '}')
+    t = _re.sub(r'(?<![#\w])(\d+)', r'<span style="font-style:normal">\1</span>', t)   # digits upright
     return '<i>' + t + '</i>'
 
 BLUE = '#dae8fc;strokeColor=#2a78d6'
