@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Uncertainty-aware link lifetime prediction and proactive routing for UAV swarms: simulation code"
+version: 1.0.0
+date-released: 2026-10-24
+license: MIT
+repository-code: "https://github.com/renatabdirayimov001/uav-uncertainty-link-lifetime"
+authors:
+  - family-names: Abdirayimov
+    given-names: Renat
+    affiliation: "Tashkent University of Information Technologies named after Muhammad al-Khwarizmi"
+keywords:
+  - UAV swarm
+  - FANET
+  - link lifetime prediction
+  - conformal prediction
+  - quantile regression
+  - routing
