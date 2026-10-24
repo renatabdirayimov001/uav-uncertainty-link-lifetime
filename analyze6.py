@@ -6,13 +6,12 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-R5, R6 = 'results5', 'results6'
-os.makedirs('figures', exist_ok=True); os.makedirs('tables', exist_ok=True)
+R5, R6, R7 = 'results5', 'results6', 'results7'
 OUTF = os.environ.get('OUTF', 'figures'); OUTT = os.environ.get('OUTT', 'tables')
 os.makedirs(OUTF, exist_ok=True); os.makedirs(OUTT, exist_ok=True)
 VAL, TEST = [7, 8, 9, 10], list(range(11, 23))
-SC = {'main': ('Base', TEST), 'N80': ('Dense ($N=80$)', [41, 42, 43]), 'noretrain': ('Degraded info.', [51, 52, 53, 54]),
-      'shift': ('Speed shift', [31, 32, 33, 34])}
+SC = {'main': ('Base', TEST), 'N80': ('Dense ($N=80$)', list(range(41, 47))), 'noretrain': ('Degraded info.', list(range(51, 59))),
+      'shift': ('Speed shift', list(range(31, 39)))}
 
 def load(mode, seeds):
     D = {}
@@ -20,6 +19,8 @@ def load(mode, seeds):
         f6, fl, f5 = f'{R6}/{mode}_s{s}.json', f'{R6}/lpar_{mode}_s{s}.json', f'{R5}/{mode}_s{s}.json'
         if not (os.path.exists(f6) and os.path.exists(fl) and os.path.exists(f5)): continue
         r = json.load(open(f6)); r.update(json.load(open(fl)))
+        f7 = f'{R7}/{mode}_s{s}.json'
+        if os.path.exists(f7): r.update(json.load(open(f7)))          # RCPLA-FANET (exp7.py)
         r5 = json.load(open(f5)); cq5 = r5['CQR a=0.1'] if 'CQR a=0.1' in r5 else r5['CQR static a=0.1']
         # RCLR, LET and the gradient-boosted point predictor are taken from the main experiment (results5) on the same traces,
         # so that every table of the paper reports identical numbers for them
@@ -34,13 +35,13 @@ V = load('main', VAL)
 fam = {'LB-OPAR': [k for k in V[7] if k.startswith('LB-OPAR w2')], 'OLSR+': [k for k in V[7] if k.startswith('OLSR+ qth')],
        'LPMD-GPSR': [k for k in V[7] if k.startswith('LPMD-GPSR')],
        'LB-OPAR LLT': [k for k in V[7] if k.startswith('LB-OPAR LLT')], 'OLSR+ LLT': [k for k in V[7] if k.startswith('OLSR+ LLT')],
-       'LPMD LSTM': [k for k in V[7] if k.startswith('LPMD LSTM')]}
+       'LPMD LSTM': [k for k in V[7] if k.startswith('LPMD LSTM')], 'RCPLA': [k for k in V[7] if k.startswith('RCPLA')]}
 ch = {f: max(ks, key=lambda k: np.mean([V[s][k]['PDR'] for s in V])) for f, ks in fam.items()}
 ch.update({'LPAR': 'LPAR', 'Rocha XGB': 'Rocha XGB', 'LET': 'LET m=4', 'CQR': 'CQR a=0.1 (proposed)'})
 print('chosen', ch)
 REF = 'CQR a=0.1 (proposed)'
 proto = [('LB-OPAR', 'LB-OPAR~\\cite{gharib2022lbopar}'), ('OLSR+', 'OLSR+~\\cite{rahmani2022olsr}'), ('LPAR', 'LPAR~\\cite{li2025predictionbased}'),
-         ('LPMD-GPSR', 'LPMD-GPSR~\\cite{dong2026lpmdgpsr}'), ('Rocha XGB', 'GB point predictor~\\cite{rocha2022evaluating} in RCLR routing'),
+         ('LPMD-GPSR', 'LPMD-GPSR~\\cite{dong2026lpmdgpsr}'), ('RCPLA', 'RCPLA-FANET~\\cite{dogaheh2026rcpla}'), ('Rocha XGB', 'GB point predictor~\\cite{rocha2022evaluating} in RCLR routing'),
          ('LET', 'LET ($m=4$~s) in RCLR routing'), ('CQR', '\\textbf{RCLR (CQR, $\\alpha=0.1$)}')]
 summary = {'chosen': ch}
 # ---------------- base scenario table
@@ -61,7 +62,7 @@ for f, lab in proto:
     cells = [f'{pdr[0]:.3f}', f'{pu[0]:.3f}', fmt(br), fmt(di), f'{hp:.2f}', dp] if f != 'CQR' else [f'{pdr[0]:.3f}', f'{pu[0]:.3f}', fmt(br), fmt(di), f'{hp:.2f}', '--', '--']
     if f == 'CQR': cells = ['\\textbf{' + c + '}' if c != '--' else c for c in cells]
     rows += lab + ' & ' + ' & '.join(cells) + ' \\\\\n'
-    if f == 'LPMD-GPSR': rows += '\\midrule\n'
+    if f == 'RCPLA': rows += '\\midrule\n'
 summary['base_cqr'] = ci([T[s][REF]['PDR'] for s in T])
 open(f'{OUTT}/tab_published.tex', 'w').write(rows)
 # ---------------- predictor level (prediction quality on 8 test traces + use in RCLR routing)
@@ -101,8 +102,8 @@ open(f'{OUTT}/tab_pub_scen.tex', 'w').write(rows)
 json.dump(summary, open(f'{R6}/summary6.json', 'w'), indent=1, default=float)
 # ---------------- figure
 # same colours as in analyze5.py for LET / GB point (ML) / CQR; published schemes get colours used nowhere else
-C = {'LB-OPAR': '#8c564b', 'OLSR+': '#17a2b8', 'LPAR': '#b5b82a', 'LPMD-GPSR': '#a3367a', 'Rocha XGB': '#1baf7a', 'LET': '#eb6834', 'CQR': '#2a78d6'}
-LBL = {'LB-OPAR': 'LB-OPAR', 'OLSR+': 'OLSR+', 'LPAR': 'LPAR', 'LPMD-GPSR': 'LPMD-GPSR', 'Rocha XGB': 'GB point predictor', 'LET': 'LET', 'CQR': 'RCLR (proposed)'}
+C = {'RCPLA': '#b03a2e', 'LB-OPAR': '#8c564b', 'OLSR+': '#17a2b8', 'LPAR': '#b5b82a', 'LPMD-GPSR': '#a3367a', 'Rocha XGB': '#1baf7a', 'LET': '#eb6834', 'CQR': '#2a78d6'}
+LBL = {'RCPLA': 'RCPLA-FANET', 'LB-OPAR': 'LB-OPAR', 'OLSR+': 'OLSR+', 'LPAR': 'LPAR', 'LPMD-GPSR': 'LPMD-GPSR', 'Rocha XGB': 'GB point predictor', 'LET': 'LET', 'CQR': 'RCLR (proposed)'}
 plt.rcParams.update({'font.size': 9, 'axes.spines.top': False, 'axes.spines.right': False, 'axes.grid': True, 'grid.color': '#e4e3df',
                      'grid.linewidth': 0.6, 'axes.edgecolor': '#8a887f', 'legend.frameon': False, 'pdf.fonttype': 42})
 fig, ax = plt.subplots(figsize=(7.0, 2.9)); keys = [f for f, _ in proto if f in fig_data]; nS = len(next(iter(fig_data.values())))
@@ -111,6 +112,6 @@ for q, f in enumerate(keys):
     ax.bar(x + (q - (len(keys) - 1) / 2) * w, fig_data[f], width=w * 0.92, color=C[f], label=LBL[f])
 for xi, v in zip(x, fig_data['CQR']): ax.text(xi + (len(keys) - 1) / 2 * w, v + 0.01, f'{v:.3f}', ha='center', fontsize=6.5, color='#1f5fae')
 ax.set_xticks(x); ax.set_xticklabels([SC[m][0].replace('$N=80$', 'N=80') for m in SC][:nS]); ax.set_ylabel('Conditional PDR'); ax.set_ylim(0, 1.0)
-ax.grid(axis='x', visible=False); fig.legend(*ax.get_legend_handles_labels(), loc='lower center', ncol=7, fontsize=7)
+ax.grid(axis='x', visible=False); fig.legend(*ax.get_legend_handles_labels(), loc='lower center', ncol=8, fontsize=6.5)
 fig.tight_layout(rect=(0, 0.08, 1, 1)); fig.savefig(f'{OUTF}/published_comparison.pdf'); plt.close(fig)
 print(json.dumps({k: v for k, v in summary.items() if k != 'chosen'}, indent=0, default=float)[:3000])
